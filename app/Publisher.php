@@ -10,4 +10,6 @@ class Publisher extends Model
     protected $primaryKey = 'pub_id';
     public $timestamps = false;
 
+    protected $fillable = ['name'];
+
 }

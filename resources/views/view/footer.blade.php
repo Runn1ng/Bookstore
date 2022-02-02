@@ -1,5 +1,4 @@
-<tr><td><center><hr><br>
-    <a href="/">На главную страницу</a></center></td></tr>
-    </table>
-</body>
-</html>    
+<div class="footer">
+<hr>
+    <h3><a href="/">На главную страницу</a></h3>
+</div>
