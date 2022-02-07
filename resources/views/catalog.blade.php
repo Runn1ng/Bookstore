@@ -28,23 +28,38 @@
 
 <div class='results'>
     @foreach ($books as $book) 
-    <table>
-        <tr><td align="right"><i>Автор: </i></td>
-        <td>{{ $book->author }}</td></tr>
-        <tr><td align="right"><i>Название: </i></td>
-        <td>{{ $book->title }}</td></tr>
-        <tr><td align="right"><i>Издательство: </i></td>
-        <td>{{ $book->publisher->name }}</td></tr>	
-        <tr><td align="right"><i>Количество страниц: </i></td>
-        <td>{{ $book->pages }}</td></tr>
-        <tr><td align="right"><i>Цена: </i></td>
-        <td>{{ $book->price }}</td></tr>
-        <tr><td align="right"><i>Год издания: </i></td>
-        <td>{{ $book->dat }}</td></tr>
-        </tr>
-        </table>
-    
+    <div class="book_result">
+        <img  width = "200" src="{{ url('storage/images/'.$book->image) }}"" alt="{{ $book->image }}" border="0">
+        <div class="book_info">
+            <span><i>Автор: </i> {{ $book->author }}</span></td>
+            <span><i>Название: </i> {{ $book->title }} </span> </td>
+            <span><i>Издательство: </i> {{ $book->publisher->name }} </span></td>
+            <span><i>Количество страниц: </i>{{ $book->pages }}</span></td>
+            <span><i>Цена: </i> {{ $book->price }}</span>
+            <span><i>Год издания: </i> {{ $book->dat }}</span>
+            <span><a class="addToCart" href="/addToCart?book_id={{$book->book_id}}">Добавить в корзину</a></span>
+        </div>
+    </div>
     @endforeach
 </div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        let elements = document.getElementsByClassName("addToCart");
+        console.log(elements);
+        for(let i = 0; i < elements.length; i++) {
+            let element = elements[i];
+            console.log(element);
+            element.onclick = function (e) {
+                e.preventDefault();
+                let url = e.target.href;
+                fetch(url, {
+                    method: 'GET',
+                });
+            }
+        }
+            
+    });
+</script>
 
 @include('view.footer')

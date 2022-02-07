@@ -1,22 +1,3 @@
-<?php
-// header("Cache-control: no-cache");
-
-// if(!isset($_COOKIE['usename'])) 
-// {
-// // cookie с именем 'usename' еще не установлено, устанавливаем ее
-// /* задаем значение cookie, определяя для нее уникальный ID для каждого отдального пользователя */
-// $cookie_value = uniqid("ID");
-// // создаем cookie с именем 'usename' с установленным уникальным ID
-// setcookie("usename", $cookie_value, time() + 60*60*24*14); 
-// }
-// // эту строчку вывода cookie после отладки можно закомментировать
-// else echo $_COOKIE['usename'];
-// /* теперь в ближайшие две недели данный пользователь будет идентифицироваться как ID… 
-// (установленный для него номер) */
-
-
-?>
-
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
 
 <html>
@@ -35,6 +16,9 @@
     .results{
         display: flex;
         flex-direction: column;
+        justify-items: center;
+        justify-content: center;
+        clear: both;
     }
     .footer {
         position: fixed;
@@ -49,6 +33,28 @@
         width: 200px;
         margin: 0 auto 0;
         padding-top: 30px;
+    }
+    .book_result {
+        display: flex;
+        height: 150px;
+        margin: 10px auto 10px;
+        width: 65%;
+        clear: both;
+    }
+    .clear { 
+        clear: both;
+        height: 60px; 
+    }
+    .book_result > img {
+        float: left;
+        height: 100%;
+    }
+    .book_info {
+        float: left;
+        margin-left: 10px;
+    }
+    .book_info > span {
+        display: block;
     }
 </style>
 </head>
