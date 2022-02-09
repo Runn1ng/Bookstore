@@ -2,10 +2,13 @@
 
 use App\Book;
 use App\Category;
+use App\Order;
 use App\OrderBasket;
+use App\OrderBooks;
 use App\Publisher;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Http\Request;
+use phpDocumentor\Reflection\DocBlock\Tags\Var_;
 
 /*
 |--------------------------------------------------------------------------
@@ -66,7 +69,6 @@ Route::post('/add/category', function (Request $request) {
 })->middleware('auth');
 
 Route::get('/add/book', function () {
-
     $publishers = Publisher::all();
     $categories = Category::all();
     return view('add.book', ['publishers' => $publishers, 'categories' => $categories]);
@@ -90,16 +92,21 @@ Route::post('/add/book', function (Request $request) {
     return redirect('/');
 })->middleware('auth');
 
-Route::get('/addToCart', function(Request $request) {
+Route::get('/addToCart', function (Request $request) {
     $bookId = $request->all()['book_id'];
+
     if (Auth::check()) {
         $userId = Auth::user()->customer_id;
     } else {
-        $userId = -1;
+        $userId = 0;
     }
 
     $cookie = $_COOKIE['usename'];
-    $order = OrderBasket::where('customer_id', $userId)->orWhere('cookie', $cookie)->where('book_id', $bookId)->first();
+
+    $order = OrderBasket::where('book_id', $bookId)->where(function($query) use ($userId, $cookie) {
+        $query->orWhere('customer_id', $userId)
+              ->orWhere('cookie', $cookie);
+    })->first();
     if (empty($order)) {
         OrderBasket::create([
             'customer_id' => $userId,
@@ -112,6 +119,134 @@ Route::get('/addToCart', function(Request $request) {
     }
 
     echo 'ok';
+});
+
+Route::get('/dropFromCart', function (Request $request) {
+    $bookId = $request->all()['book_id'];
+    if (Auth::check()) {
+        $userId = Auth::user()->customer_id;
+    } else {
+        $userId = 0;
+    }
+
+    $cookie = $_COOKIE['usename'];
+
+    OrderBasket::where('book_id', $bookId)->where(function($query) use ($userId, $cookie) {
+        $query->orWhere('customer_id', $userId)
+              ->orWhere('cookie', $cookie);
+    })->delete();
+
+    echo 'ok';
+});
+
+Route::get('/cart', function (Request $request) {
+    $orders = [];
+    $sum = 0;
+
+    if (Auth::check()) {
+        $userId = Auth::user()->customer_id;
+    } else {
+        $userId = 0;
+    }
+
+    $cookie = $_COOKIE['usename'];
+    $orderBasket = OrderBasket::where(function($query) use ($userId, $cookie) {
+        $query->orWhere('customer_id', $userId)
+              ->orWhere('cookie', $cookie);
+    })->groupBy('book_id')->selectRaw('*, SUM(count) as count')->get();
+    
+    foreach($orderBasket as $order) {
+        $bookSum = $order->book->price * $order->count; 
+        $orders []= [
+            'book_id' => $order->book_id,
+            'sum' => $bookSum,
+            'bookName' => $order->book->title,
+            'count' => $order->count,
+            'price' => $order->book->price
+        ];
+        $sum += $bookSum;
+    }
+
+    return view('cart', ['orders' => $orders, 'sumAll' => $sum]);
+});
+
+Route::post('/makeOrder', function (Request $request) {
+    $data = $request->all();
+    $orders = [];
+    $sum = 0;
+
+    if (Auth::check()) {
+        $userId = Auth::user()->customer_id;
+    } else {
+        $userId = 0;
+    }
+
+    $cookie = $_COOKIE['usename'];
+    $orderBasket = OrderBasket::where(function($query) use ($userId, $cookie) {
+        $query->orWhere('customer_id', $userId)
+              ->orWhere('cookie', $cookie);
+    })->groupBy('book_id')->selectRaw('*, SUM(count) as count')->get();
+    
+    if (count($orderBasket) == 0) {
+        return redirect('/lk');
+    }
+
+    $newOrder = Order::create([
+        'order_date' => date("Y-m-d H:i:s", strtotime('+5 hour')),
+        'customer_id' => $userId,
+        'dostavka' => $data['dostavka'] ?? 1,
+        'bonus' => 10 
+    ]);
+
+    foreach($orderBasket as $order) {
+        OrderBooks::create([
+            'order_id' => $newOrder->order_id,
+            'book_id' => $order->book_id,
+            'count' => $order->count,
+            'price' => $order->book->price
+        ]);
+    }
+
+    OrderBasket::where(function($query) use ($userId, $cookie) {
+        $query->orWhere('customer_id', $userId)
+              ->orWhere('cookie', $cookie);
+    })->delete();
+    
+    return redirect('/lk');
+    // return view('cart', ['orders' => $orders, 'sumAll' => $sum]);
+});
+
+Route::get('/lk', function() {
+    $userId = Auth::user()->customer_id;
+
+    $dostavka = [
+        1 => "Почтой",
+        2 => "Самовывоз",
+        3 => "Курьер"
+    ];
+
+    $orders = Order::where('customer_id', $userId)->get();
+
+    $result = [];
+
+    foreach($orders as $order) {
+        $books = OrderBooks::where('order_id', $order->order_id)->get();
+        $orderBooks = [];
+        
+        foreach($books as $book) {
+            $orderBooks []= $book->book->title;
+        }
+
+        $result []= [
+            'orderId' => $order->order_id,
+            'orderDate' => $order->order_date,
+            'books' => implode(', ', $orderBooks),
+            'dostavka' => $dostavka[$order->dostavka],
+            'bonus' => $order->bonus
+        ];
+    }
+
+    return view('lk', ['result' => $result]);
 });
 
 Auth::routes();

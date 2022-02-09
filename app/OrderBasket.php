@@ -11,4 +11,8 @@ class OrderBasket extends Model
 
     protected $fillable = ['customer_id', 'book_id', 'count', 'cookie'];
 
+    public function book(){
+        return $this->belongsTo('App\Book', 'book_id');
+    }
+
 }

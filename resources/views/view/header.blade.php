@@ -13,7 +13,7 @@
         margin: 0 20px;
         padding: 5px;
     }
-    .results{
+    .results, .cart{
         display: flex;
         flex-direction: column;
         justify-items: center;
@@ -56,6 +56,20 @@
     .book_info > span {
         display: block;
     }
+    .order {
+        display: flex;
+        margin: 5px auto;
+    }
+    .order > div {
+        padding: 5px;
+    }
+    .cart_sum {
+        float: right;
+        margin: 25px auto 5px;
+    }
+    .buy {
+        margin: 10px auto;
+    }
 </style>
 </head>
 
@@ -86,16 +100,16 @@
 <td colspan="4" align="center" bgcolor="#ccccff">
 <font face="Arial" size="+3"><i><b>Книжный магазин</b></i></font></td></tr>
 <tr><td align="center" bgcolor="#aaddff" width="20%">
-<a href="catalog.php"><b>Каталог</b></a></td>
+<a href="/"><b>Каталог</b></a></td>
 <td align="center" bgcolor="#ddaaff" width="20%">
-<a href="basket.php"><b>Корзина</b></a></td>
+<a href="/cart"><b>Корзина</b></a></td>
 @guest
 <td align="center" bgcolor="#aaaaff" width="20%">
 <a href="/register"><b>Регистрация</b></a></td>
 @endguest
-<td align="center" bgcolor="#ffaaff" width="20%">
-<a href="order.php"><b>Заказ</b></a></td>
 @auth
+<td align="center" bgcolor="#ffaaff" width="20%">
+<a href="/lk"><b>Заказы</b></a></td>
 <td align="center" bgcolor="#aaffee" width="20%">
 <form action="/logout" method="POST">
     @csrf
