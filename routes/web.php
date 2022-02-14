@@ -240,7 +240,7 @@ Route::get('/lk', function() {
         $result []= [
             'orderId' => $order->order_id,
             'orderDate' => $order->order_date,
-            'books' => implode(', ', $orderBooks),
+            'books' => $orderBooks,
             'dostavka' => $dostavka[$order->dostavka],
             'bonus' => $order->bonus
         ];

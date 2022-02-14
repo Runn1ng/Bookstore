@@ -4,20 +4,21 @@
 @foreach ($result as $order)
 
     <div class="order">
-        <div>
+        <div style="width: 50px">
             ID{{$order['orderId']}}
         </div>
-        <div>
+        <div style="width: 150px;">
             Дата {{ $order['orderDate'] }}
         </div>
-        <div>
-            Книги: {{ $order['books'] }}
+        <div style="width: 450px">
+            <div> Книги: </div> 
+            @foreach ($order['books'] as $book) 
+            {{ $book }}<br>
+            @endforeach 
         </div>
-        <div>
-            Доставка {{ $order['dostavka'] }} 
-        </div>
-        <div>
-            Бонус {{ $order['bonus'] }} руб.
+        <div style="width: 75px;">
+            Доставка <br>
+            {{ $order['dostavka'] }} 
         </div>
     </div>
 @endforeach

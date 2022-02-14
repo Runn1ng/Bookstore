@@ -21,6 +21,7 @@
         clear: both;
     }
     .footer {
+        background-color: lightgrey;
         position: fixed;
         left: 0;
         bottom: 0;
